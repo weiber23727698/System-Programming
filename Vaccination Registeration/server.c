@@ -1,4 +1,3 @@
-//討論同學：b09902053、b09902055、b09902073、b08202029
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,7 +52,7 @@ static void free_request(request* reqP);
 // free resources used by a request instance
 
 typedef struct {
-    int id;          //902001-902020
+    int id;          // 902001-902020
     int AZ;          
     int BNT;         
     int Moderna;     
@@ -122,11 +121,10 @@ int main(int argc, char** argv) {
     int sign = 0;
 
     while (1) {
-        // TODO: Add IO multiplexing
+        // Add IO multiplexing
         memcpy(&copyread, &readfd, sizeof(readfd));
         memcpy(&copywrite, &writefd, sizeof(writefd));
         int ready = select(maxfd, &copyread, &copywrite, NULL, NULL);
-        //printf("select: %d\n", ready);
         // Check new connection
         if(FD_ISSET(svr.listen_fd, &copyread)){
             ready--;
@@ -147,17 +145,8 @@ int main(int argc, char** argv) {
             requestP[conn_fd].conn_fd = conn_fd;
             strcpy(requestP[conn_fd].host, inet_ntoa(cliaddr.sin_addr));
             fprintf(stderr, "getting a new request... fd %d from %s\n", conn_fd, requestP[conn_fd].host);
-            /*
-            printf("middle\n");
-            int ret = handle_read(&requestP[conn_fd]); // parse data from client to requestP[conn_fd].buf
-            fprintf(stderr, "ret = %d\n", ret);
-            if (ret < 0) {
-                fprintf(stderr, "bad request from %s\n", requestP[conn_fd].host);
-                continue;
-            }
-            */
         }
-    // TODO: handle requests from clients
+        // handle requests from clients
         for(int i = 0;i < maxfd;i++){
             sign = 0;
             if(i == svr.listen_fd) continue;
@@ -175,7 +164,6 @@ int main(int argc, char** argv) {
                     #endif
                 }
                 else if(requestP[i].stage == 3){//write original preference
-                    //printf("stage 3\n");
                     if(rR[requestP[i].id-902001].AZ == 1 && rR[requestP[i].id-902001].BNT == 3)
                         write(requestP[i].conn_fd, "Your preference order is AZ > Moderna > BNT.\n", 45);
                     else if(rR[requestP[i].id-902001].AZ == 1 && rR[requestP[i].id-902001].Moderna == 3)
@@ -194,23 +182,21 @@ int main(int argc, char** argv) {
                         close(requestP[i].conn_fd);
                         free_request(&requestP[i]);
                     }
-                    if(requestP[i].wait_for_write == 1){//write_server要往 stage 4 前進//write_server get input
+                    if(requestP[i].wait_for_write == 1){// write_server要往 stage 4 前進 // write_server get input
                         requestP[i].stage = 4;
                         //printf("stage 4\n");
                         write(requestP[i].conn_fd, "Please input your preference order respectively(AZ,BNT,Moderna):\n", 65);
                         requestP[i].stage = 5;
                     }
                 }
-                else if(requestP[i].stage == 6){//invalid id
-                    //printf("stage 6\n");
+                else if(requestP[i].stage == 6){// invalid id
                     write(requestP[i].conn_fd, "[Error] Operation failed. Please try again.\n", 44);
                     FD_CLR(i, &writefd);
                     FD_CLR(i, &readfd);
                     close(requestP[i].conn_fd);
                     free_request(&requestP[i]);
                 }
-                else if(requestP[i].stage>=7 && requestP[i].stage<=12){//write new preference
-                    //printf("stage 7~12\n");
+                else if(requestP[i].stage>=7 && requestP[i].stage<=12){// write new preference
                     if(requestP[i].stage == 7){
                         p1[25] = (requestP[i].id-902000)/10 + '0', p1[26] = (requestP[i].id-902000)%10 + '0';
                         write(requestP[i].conn_fd, p1, 92);
@@ -239,9 +225,8 @@ int main(int argc, char** argv) {
                     FD_CLR(i, &readfd);
                     close(requestP[i].conn_fd);
                     free_request(&requestP[i]);
-                }
-                else if(requestP[i].stage == 13){//invalid preference
-                    //printf("stage 13\n");
+                } 
+                else if(requestP[i].stage == 13){// invalid preference
                     write(requestP[i].conn_fd, "[Error] Operation failed. Please try again.\n", 44);
                     FD_CLR(i, &writefd);
                     FD_CLR(i, &readfd);
@@ -292,13 +277,13 @@ int main(int argc, char** argv) {
                                         iswrite[requestP[i].id-902001] = 1;
                                 }
                             }
-                            if(sign < 0)//已經有lock => 斷線;
+                            if(sign < 0)// locked => end connection
                                 requestP[i].stage = 14;
                             else{
                                 fseek(fp, sizeof(registerRecord)*(requestP[i].id-902001), SEEK_SET);
                                 fread(&rR[requestP[i].id-902001], sizeof(registerRecord), 1, fp);
                                 requestP[i].stage = 3;
-                                if(requestP[i].wait_for_write == 0){//read server讀完id就可以unlock
+                                if(requestP[i].wait_for_write == 0){// read server unlock it after read the wanted id
                                     unlk.l_start = sizeof(registerRecord)*(requestP[i].id-902001);
                                     fcntl(fileno(fp), F_SETLK, &unlk);
                                     isread[requestP[i].id-902001] = 0;
@@ -308,7 +293,6 @@ int main(int argc, char** argv) {
                     }           
                 }
                 else if(requestP[i].stage == 5){
-                    //printf("stage 5\n");
                     handle_read(&requestP[i]);
                     if(requestP[i].buf_len != 5)
                         requestP[i].stage = 13;
@@ -350,7 +334,7 @@ int main(int argc, char** argv) {
                     }
                     else
                         requestP[i].stage = 13;//invalid input release clock
-                    //一輸入完preference就unlock
+                    // unlock it upon finishing entering the preference
                     unlk.l_start = sizeof(registerRecord)*(requestP[i].id-902001);
                     fcntl(fileno(fp), F_SETLK, &unlk);
                     iswrite[requestP[i].id-902001] = 0;
@@ -381,7 +365,6 @@ int main(int argc, char** argv) {
 }
 
 // ======================================================================================================
-// You don't need to know how the following codes are working
 #include <fcntl.h>
 
 static void init_request(request* reqP) {
