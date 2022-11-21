@@ -64,18 +64,15 @@ void multipro(int tag){
     }
 }
 */
-void *working(void *arg){//check required~~~~~
+void *working(void *arg){// check required~~~~~
     int *tag = (int*)arg;
-    //printf("tag is %d\n", *tag);
     int up = (r*(c+1)-2) / nthread;
-    //printf("up is %d\n", up);
     for(int i = 0;i <= up;i++){
         int idx = *tag + nthread*i;
-        if(idx<=r*(c+1)-2){
+        if(idx <= r*(c+1)-2){
             if(table1[idx]=='\n' || table2[idx]=='\n')
                 table1[idx] = '\n', table2[idx] = '\n';
             else{
-                //printf("idx is %d\n", idx);
                 transform(idx);
             }
         }
@@ -93,7 +90,7 @@ int main(int argc, char *argv[]){
     fscanf(fpin, "%d %d %d", &r, &c, &epoch);
     int fdin = fileno(fpin), fdout = fileno(fpout), len = ftell(fpin)+1;
     lseek(fdin, len, SEEK_SET);
-    table1 = (char*)mmap(NULL, (c+2)*(r+2)*sizeof(char), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);//table1[r*(c+1)] is useless
+    table1 = (char*)mmap(NULL, (c+2)*(r+2)*sizeof(char), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);// table1[r*(c+1)] is useless
     table2 = (char*)mmap(NULL, (c+2)*(r+2)*sizeof(char), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     read(fdin, table1, c*r+1*(r-1));//pending
     if(mode == 2){
@@ -109,7 +106,7 @@ int main(int argc, char *argv[]){
 	    
             for(int i = 0;i < nthread;i++)
                 pthread_join(tid[i], &tret);
-	    //pthread_exit(NULL);
+	    // pthread_exit(NULL);
         }
     }
     else if(mode == 1){
@@ -134,9 +131,7 @@ int main(int argc, char *argv[]){
     char *final;
     if(epoch%2==0)  final = table1;
     else    final = table2;
-    //printf("table1:\n%s\n", table1);
-    //printf("table2:\n%s\n", table2);
-    write(fdout, final, c*r+1*(r-1));//pending
+    write(fdout, final, c*r+1*(r-1));// pending
     fclose(fpin), fclose(fpout);
     return 0;
 }
