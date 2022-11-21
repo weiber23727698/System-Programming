@@ -31,22 +31,22 @@ int main(int argc, char *argv[]){
         sprintf(host_number, "%d", host_id);
         sprintf(lucky_number, "%d", lucky);
         if(fork() == 0){
-            dup2(fd1[0], 0);//read from stdin
-            dup2(fd2[1], 1);//write to stdout
+            dup2(fd1[0], 0);// read from stdin
+            dup2(fd2[1], 1);// write to stdout
             close(fd1[0]), close(fd1[1]), close(fd2[0]), close(fd2[1]), close(fd3[0]), close(fd3[1]), close(fd4[0]), close(fd4[1]);;
             execlp("./host", "./host", "-m", host_number, "-d", "1", "-l", lucky_number, NULL);
         }
         if(fork() == 0){
-            dup2(fd3[0], 0);//read from stdin
-            dup2(fd4[1], 1);//write to stdout
+            dup2(fd3[0], 0);// read from stdin
+            dup2(fd4[1], 1);// write to stdout
             close(fd1[0]), close(fd1[1]), close(fd2[0]), close(fd2[1]),close(fd3[0]), close(fd3[1]), close(fd4[0]), close(fd4[1]);
             execlp("./host", "./host", "-m", host_number, "-d", "1", "-l", lucky_number, NULL);
         }
         close(fd1[0]), close(fd2[1]), close(fd3[0]), close(fd4[1]);
         int score[13] = {0};
         while(1){
-                for(int i = 0;i < 13;i++)
-                        score[i] = 0;
+            for(int i = 0;i < 13;i++)
+                score[i] = 0;
             fscanf(fifo_x, "%d %d %d %d %d %d %d %d", &id[0], &id[1], &id[2], &id[3], &id[4], &id[5], &id[6], &id[7]);
             fprintf(to_child1, "%d %d %d %d\n", id[0], id[1], id[2], id[3]);
             fflush(to_child1);
@@ -60,9 +60,8 @@ int main(int argc, char *argv[]){
                     if(abs(l_guess-lucky) <= abs(r_guess-lucky)){
                         score[left] = score[left] + 10;
                     }
-                    else{
+                    else
                         score[right] = score[right] + 10;
-                    }
                 }
                 fprintf(fifo_0, "%d\n%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n", host_id, id[0], score[id[0]], id[1], score[id[1]], id[2], score[id[2]], id[3], score[id[3]], id[4], score[id[4]], id[5], score[id[5]], id[6], score[id[6]], id[7], score[id[7]]);
                 fflush(fifo_0);
@@ -91,14 +90,14 @@ int main(int argc, char *argv[]){
         sprintf(host_number, "%d", host_id);
         sprintf(lucky_number, "%d", lucky);
         if(fork() == 0){
-            dup2(fd5[0], 0);//read from stdin
-            dup2(fd6[1], 1);//write to stdout
+            dup2(fd5[0], 0);// read from stdin
+            dup2(fd6[1], 1);// write to stdout
             close(fd5[0]), close(fd5[1]), close(fd6[0]), close(fd6[1]),close(fd7[0]), close(fd7[1]), close(fd8[0]), close(fd8[1]);
             execlp("./host", "./host", "-m", host_number, "-d", "2", "-l", lucky_number, NULL);
         }
         if(fork() == 0){
-            dup2(fd7[0], 0);//read from stdin
-            dup2(fd8[1], 1);//write to stdout
+            dup2(fd7[0], 0);// read from stdin
+            dup2(fd8[1], 1);// write to stdout
             close(fd5[0]), close(fd5[1]), close(fd6[0]), close(fd6[1]),close(fd7[0]), close(fd7[1]), close(fd8[0]), close(fd8[1]);
             execlp("./host", "./host", "-m", host_number, "-d", "2", "-l", lucky_number, NULL);
         }
