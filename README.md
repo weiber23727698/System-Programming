@@ -1,5 +1,5 @@
 # System-Programming
-Here are four small projects about system programming of C language.
+This repository shows my work for NTU course, *System Programming*. All of them is implemented in C language.
 * Vaccination Registeration: 
   * Clients will enter their preferred order of 3 types of vaccination, and all I have to do is to record what they typed in.
   * This system also supports multiple clients to connect.
